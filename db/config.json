@@ -1,0 +1,9 @@
+{
+    "db": {
+        "host": "ds247838.mlab.com",
+        "port": "47838",
+        "name": "nodejs_homework5",
+        "user": "HukkeJlb",
+        "password": "100693qwerty"
+    }
+}
