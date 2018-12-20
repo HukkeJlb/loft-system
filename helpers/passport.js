@@ -4,6 +4,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 
 passport.serializeUser(function(user, done) {
+  console.log('user from serialize', user);
   done(null, user.id);
 });
 
@@ -12,6 +13,7 @@ passport.deserializeUser(function(id, done) {
     done(null, id);
   } else {
     User.findById(id, function(err, user) {
+      console.log('user from deserialize', user); //user found
       done(err, user);
     });
   }
@@ -24,6 +26,8 @@ passport.use(
       passwordField: "password"
     },
     function(username, password, done) {
+      console.log("username", username);
+      console.log("password", password);
       User.findOne({ username: username })
         .then(user => {
           console.log("user from passport", user);

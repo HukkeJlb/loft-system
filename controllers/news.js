@@ -30,7 +30,21 @@ module.exports.newNews = async (req, res, next) => {
 };
 
 module.exports.updateNews = async (req, res, next) => {
-  console.log("updateNews");
+  try {
+    const formData = formDataParser(req.text);
+    const news = new News();
+
+    await News.findOneAndUpdate(
+      { _id: req.params.id },
+      { theme: formData.theme, text: formData.text },
+      { new: true }
+    );
+
+    const newNews = await news.getNews();
+    res.status(200).json(newNews);
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports.deleteNews = async (req, res, next) => {
