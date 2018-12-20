@@ -33,7 +33,7 @@ module.exports.saveNewUser = (req, res, next) => {
       user.password = bcrypt.hashSync(password, salt);
       user.image = formData.image;
       user.permissionId = uuid();
-      user.access_token = "";
+      user.access_token = uuid();
       user
         .save()
         .then(user => {
