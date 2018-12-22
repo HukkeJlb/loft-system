@@ -12,6 +12,7 @@ const basicRouter = require("./routes/index");
 const apiRouter = require("./routes/api");
 
 const app = express();
+require("./helpers/passport")(passport);
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
@@ -48,7 +49,6 @@ app.use(
   })
 );
 
-require("./helpers/passport");
 app.use(passport.initialize());
 app.use(passport.session());
 

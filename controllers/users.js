@@ -49,6 +49,7 @@ module.exports.saveNewUser = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const formData = formDataParser(req.text);
+  req.body = req.text;
 
   User.findOne({ username: formData.username })
     .then(user => {
@@ -78,6 +79,8 @@ module.exports.login = (req, res, next) => {
     .catch(next);
 
   // passport.authenticate("local", function(err, user, info) {
+  //   console.log('req.body', req.body);
+  //   console.log('user: ', user);
   //   // console.log("passport user from session: ", req.session.passport.user);
   //   // console.log("req.user: ", req.user);
   //   if (err) {
@@ -90,7 +93,6 @@ module.exports.login = (req, res, next) => {
   //     if (err) {
   //       return next(err);
   //     }
-  //     const formData = formDataParser(req.text);
   //     if (formData.remembered) {
   //       const token = uuid();
   //       user.setToken(token);
@@ -100,35 +102,30 @@ module.exports.login = (req, res, next) => {
   //           path: "/",
   //           httpOnly: true
   //         });
-  //         return res.json(user);
+  //         return res.send(user);
   //       });
   //     } else {
-  //       return res.json(user);
+  //       return res.send(user);
   //     }
   //   });
   // })(req, res, next);
 };
 
-module.exports.authFromToken = async (req, res, next) => {
+module.exports.authFromToken = (req, res, next) => {
+  console.log("authFromToken triggered");
   const access_token = req.cookies.access_token;
   if (access_token) {
-    try {
-      const user = await User.findOne({ access_token: access_token });
-      console.log(user);
-      if (user) {
+    User.findOne({ access_token: access_token })
+      .then(user => {
+        // console.log(user);
         req.logIn(user, err => {
           if (err) {
             next(err);
           }
           res.status(200).json(user);
         });
-      }
-      next();
-    } catch (err) {
-      next(err);
-    }
-  } else {
-    next();
+      })
+      .catch(next);
   }
 };
 
@@ -209,11 +206,7 @@ module.exports.saveUserImage = (req, res, next) => {
       }
       let image = fileName.substr(fileName.indexOf("/"));
 
-      User.findOneAndUpdate(
-        { _id: userId },
-        { image: image },
-        { new: true }
-      )
+      User.findOneAndUpdate({ _id: userId }, { image: image }, { new: true })
         .then(user => {
           return res.json({ path: user.image });
         })
@@ -223,7 +216,6 @@ module.exports.saveUserImage = (req, res, next) => {
 };
 
 module.exports.deleteUser = (req, res, next) => {
-  console.log(req.params.id);
   User.findOneAndRemove({ _id: req.params.id }, function(err, user) {
     if (err) {
       throw err;
